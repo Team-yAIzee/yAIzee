@@ -1,5 +1,4 @@
 # diceui.py
-# Author: Fabian Ruttmann
 # Graphics implementation for displaying virtual dice (Kivy)
 
 import kivy

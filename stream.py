@@ -1,5 +1,4 @@
 # stream.py
-# Author: Fabian R.
 # Stream classes for use in Kivy UI
 
 from abc import ABC, abstractmethod

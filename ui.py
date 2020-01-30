@@ -1,5 +1,4 @@
 # ui.py
-# Author: Fabian R.
 # User interface implementation
 from kivy.clock import Clock
 from kivy.graphics.texture import Texture

@@ -1,5 +1,4 @@
 # main.py
-# Author: Fabian R.
 # Display continously taken images from a connected webcam with Kivy
 
 # Kivy UI
