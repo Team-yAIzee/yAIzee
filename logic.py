@@ -66,19 +66,22 @@ def circle_kernel(radius, border):
     return np.array(array).astype(np.float32)
 
 
-def filter_dice_eyes(image, eye_kernel, match_thresh=0.6):
+def filter_dice_eyes(image, eye_kernel, match_thresh=0.6, dist_thresh=15):
+    hsv = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
+
     # Apply threshold to image brightness in order to prevent unwanted color differences from appearing
     # in the resulting image
-    hsv = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
     threshed = ((hsv[:, :, 2] < 140) * 255).astype(np.uint8)
-
     threshed = (threshed / 255.0).astype(np.float32)  # treshed/255.0 -> float -> float32
+    threshed[0:1080, 0:350] = 0.  # problematic with other cameras
+    threshed[0:1080, 1400:1920] = 0.  # problematic with other cameras
+    original_shape = threshed.shape
 
     matches = cv2.matchTemplate(threshed, eye_kernel, cv2.TM_SQDIFF_NORMED)
 
-    threshed_matchings = matches < match_thresh
+    threshed_matches = matches < match_thresh
 
-    found = np.where(threshed_matchings)
+    found = np.where(threshed_matches)
     found_arr = np.asarray([i for i in zip(*found)])
 
     fuse = True
@@ -86,20 +89,30 @@ def filter_dice_eyes(image, eye_kernel, match_thresh=0.6):
         fuse = False
 
         for p in found_arr:
+            if len(found_arr) < 2:
+                # distance.cdist does not work with only one value in array
+                break
             dist = distance.cdist(found_arr, [p])
             nearest_other = np.argsort(dist[:, 0])[1]
-            if (abs(found_arr[nearest_other] - p) < 25).all() == True:
+            if (abs(found_arr[nearest_other] - p) < dist_thresh).all() == True:
                 found_arr = np.delete(found_arr, nearest_other, axis=0)
                 fuse = True
                 break  # In case some other code added below
 
     # debug
-    figure = np.zeros(shape=threshed_matchings.shape)
+    core_figure = np.zeros(shape=threshed_matches.shape)
     for i, p in enumerate(found_arr):
-        figure[found_arr[i, 0]:found_arr[i, 0] + 10, found_arr[i, 1]:found_arr[i, 1] + 10] = 1.
+        core_figure[found_arr[i, 0]:found_arr[i, 0] + 10, found_arr[i, 1]:found_arr[i, 1] + 10] = 1.
 
-    plt.figure(figsize=(20, 20))
-    plt.imshow(figure, cmap='gray')
-    plt.show()
+    # Restore original image shape
+    figure = np.zeros(original_shape)
+    # Assume both paddings are the same
+    padding = ((np.array(original_shape) - np.array(threshed_matches.shape)) // 2)[0]
+
+    figure[padding:original_shape[0]-padding, padding:original_shape[1]-padding] = core_figure
+
+    # plt.core_figure(figsize=(20, 20))
+    # plt.imshow(core_figure, cmap='gray')
+    # plt.show()
 
     return figure  # TODO should be changed to found_arr later, but for testing purposes returns resulting image
