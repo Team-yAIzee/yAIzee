@@ -73,7 +73,7 @@ def filter_dice_eyes(image, eye_kernel, match_thresh=0.6, dist_thresh=15):
     # in the resulting image
     threshed = ((hsv[:, :, 2] < 140) * 255).astype(np.uint8)
     threshed = (threshed / 255.0).astype(np.float32)  # treshed/255.0 -> float -> float32
-    threshed[0:1080, 0:350] = 0.  # problematic with other cameras
+    threshed[0:1080, 0:370] = 0.  # problematic with other cameras
     threshed[0:1080, 1400:1920] = 0.  # problematic with other cameras
     original_shape = threshed.shape
 
