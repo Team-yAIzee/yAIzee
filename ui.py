@@ -15,7 +15,7 @@ from matplotlib.pyplot import imsave
 from kivy import graphics
 
 from stream import WebcamStream
-from logic import mark_circles_in_image
+from logic import *
 from game_sidebar import GameSidebar
 
 import cv2
@@ -66,8 +66,8 @@ class Video(BoxLayout):
 
     def capture(self):
         home = Path.home()
-        image = mark_circles_in_image(self.stream.read())
-        imsave(str(home) + '/Downloads/IMG' + strftime("%Y%m%d%H%M%S", localtime()) + '.jpg', self.stream.read())
+        image = filter_dice_eyes(self.stream.read(), circle_kernel(8, 5), match_thresh=0.6)
+        imsave(str(home) + '/Downloads/IMG' + strftime("%Y%m%d%H%M%S", localtime()) + '.jpg', image, cmap='gray')
 
     def build_ui(self):
         self.wimg = Image(size=self.stream.dimensions)
