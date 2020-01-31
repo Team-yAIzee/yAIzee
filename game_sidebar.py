@@ -30,7 +30,7 @@ class GameSidebar(BoxLayout):
         self.on_view_mode_changed: Callable = None  # Callback for view mode changes. Parameters: New view mode
 
         self.view_spinner = Spinner(size_hint=(1.0, None), size=(200, 50))
-        self.view_spinner.values = ['Normal', 'Canny', 'Value', 'ThreshValue', 'HoughTransform']
+        self.view_spinner.values = ['Normal', 'Canny', 'Value', 'ThreshValue', 'HoughTransform', 'DiceRecognition']
         self.view_spinner.text = self.view_spinner.values[0]         
         self.view_spinner.bind(text=self.view_mode_changed)
 

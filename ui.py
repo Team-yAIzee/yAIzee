@@ -52,13 +52,19 @@ class Video(BoxLayout):
             buf = cv2.cvtColor(buf[:, :, 2], cv2.COLOR_GRAY2RGB)  # Convert only value back to color
 
         if self.display_mode == 'ThreshValue':  # Brightness
-            threshold = 128
-            buf = cv2.cvtColor(buf, cv2.COLOR_RGB2HSV)
-            buf = cv2.cvtColor(((buf[:, :, 2] > threshold) * 255.0).astype(np.uint8),
-                               cv2.COLOR_GRAY2RGB)  # Convert only value back to color
+            hsv = cv2.cvtColor(buf, cv2.COLOR_RGB2HSV)
+            threshed = ((hsv[:, :, 2] < 140) * 255).astype(np.uint8)
+            threshed[0:1080, 0:350] = 0
+            threshed[0:1080, 1400:1920] = 0
+            buf = cv2.cvtColor(threshed, cv2.COLOR_GRAY2RGB)
 
         if self.display_mode == 'HoughTransform':
             buf = mark_circles_in_image(buf)
+
+        if self.display_mode == 'DiceRecognition':
+            buf = filter_dice_eyes(buf, circle_kernel(8, 5))
+            buf = (buf * 255).astype(np.uint8)
+            buf = cv2.cvtColor(buf, cv2.COLOR_GRAY2RGB)
 
         texture = Texture.create(size=self.stream.dimensions)
         texture.blit_buffer(buf.tobytes(), colorfmt="rgb", bufferfmt="ubyte")
@@ -66,7 +72,7 @@ class Video(BoxLayout):
 
     def capture(self):
         home = Path.home()
-        image = filter_dice_eyes(self.stream.read(), circle_kernel(8, 5), match_thresh=0.6)
+        image = filter_dice_eyes(self.stream.read(), circle_kernel(8, 5))
         imsave(str(home) + '/Downloads/IMG' + strftime("%Y%m%d%H%M%S", localtime()) + '.jpg', image, cmap='gray')
 
     def build_ui(self):
