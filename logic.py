@@ -9,6 +9,7 @@ from skimage.filters import gaussian
 import numpy as np
 from scipy.spatial import distance
 import cv2
+from configuration import obtain_configuration
 import matplotlib.pyplot as plt
 
 
@@ -73,8 +74,13 @@ def filter_dice_eyes(image, eye_kernel, match_thresh=0.6, dist_thresh=15):
     # in the resulting image
     threshed = ((hsv[:, :, 2] < 140) * 255).astype(np.uint8)
     threshed = (threshed / 255.0).astype(np.float32)  # treshed/255.0 -> float -> float32
-    threshed[0:1080, 0:370] = 0.  # problematic with other cameras
-    threshed[0:1080, 1400:1920] = 0.  # problematic with other cameras
+
+    # Cut margins
+    threshed[0:obtain_configuration()["image"]["height"],
+        0:obtain_configuration()["image"]["cut_left_stop"]] = 0.
+    threshed[0:obtain_configuration()["image"]["height"],
+        obtain_configuration()["image"]["cut_right_start"]:obtain_configuration()["image"]["width"]] = 0.
+
     original_shape = threshed.shape
 
     matches = cv2.matchTemplate(threshed, eye_kernel, cv2.TM_SQDIFF_NORMED)
