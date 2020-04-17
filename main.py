@@ -5,11 +5,12 @@
 from kivy.app import App
 from kivy.clock import Clock
 
+from configuration import obtain_configuration
 from stream import VideoStream
 from ui import *
 
-from kivy.core.window import Window # MI
-Window.size = (1800, 1000)  # MI
+from kivy.core.window import Window  # MI
+Window.size = (obtain_configuration()["window"]["width"], obtain_configuration()["window"]["height"])
 Window.left = 50  # MI
 Window.top = 50  # MI
 

@@ -1,0 +1,12 @@
+{
+  "window": {
+    "width": 1800,
+    "height": 1000
+  },
+  "image": {
+    "width": 1920,
+    "height": 1080,
+    "cut_left_stop": 370,
+    "cut_right_start": 1400
+  }
+}
